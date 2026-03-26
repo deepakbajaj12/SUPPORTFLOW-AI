@@ -1,0 +1,19 @@
+name: supportflow-ai
+display_name: SupportFlow AI
+version: 0.1.0
+description: OpenEnv customer support resolution environment with graded tasks.
+entrypoints:
+  reset: /reset
+  step: /step
+  state: /state
+  tasks: /tasks
+  grader: /grader
+  baseline: /baseline
+models:
+  action_model: app.models.Action
+  observation_model: app.models.Observation
+  state_model: app.models.StateResponse
+tasks:
+  - easy_billing_classification
+  - medium_technical_response
+  - hard_refund_multistep
