@@ -65,12 +65,7 @@ def grader() -> GraderResponse:
     return GraderResponse(
         task_id=snapshot["task_id"],
         score=details["score"],
-        breakdown={
-            "classification": details["classification"],
-            "followup": details["followup"],
-            "resolution": details["resolution"],
-            "closure": details["closure"],
-        },
+        breakdown={key: float(value) for key, value in details.items() if key != "score"},
     )
 
 

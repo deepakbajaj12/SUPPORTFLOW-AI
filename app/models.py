@@ -90,6 +90,9 @@ class BaselineResult(BaseModel):
     task_id: str
     score: float
     steps: int
+    breakdown: dict[str, float]
+    failure_case_score: float
+    failure_case_reason: str
 
 
 class BaselineResponse(BaseModel):

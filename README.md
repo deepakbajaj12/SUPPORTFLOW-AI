@@ -13,19 +13,53 @@ An AI agent must classify issues, respond appropriately, and resolve tickets usi
 ## Why this environment
 
 - Realistic domain: customer support workflows used in SaaS and e-commerce teams.
-- Incremental difficulty: easy -> medium -> hard tasks.
-- Reward shaping: partial progress signals encourage useful intermediate behavior.
+- Incremental difficulty with edge cases: easy -> medium -> hard tasks.
+- Nuanced grader: combines classification, follow-up behavior, resolution quality, empathy, safety, policy compliance, and efficiency.
+- Reward shaping includes partial progress, quality bonuses, and negative penalties for unsafe tone or premature closure.
+
+## Demo
+
+Short walkthrough GIF (replace with your own recorded run before final submission):
+
+![SupportFlow AI Demo](docs/demo.gif)
+
+## Architecture
+
+```mermaid
+flowchart TD
+  A[Agent Policy] -->|POST /reset| B[FastAPI App]
+  A -->|POST /step| B
+  B --> C[SupportFlowEnvironment]
+  C --> D[Task Scenario Engine]
+  C --> E[Reward + Signal Tracker]
+  C --> F[Nuanced Grader]
+  F -->|GET /grader| B
+  C -->|state snapshot| B
+  B -->|GET /state /tasks /baseline| A
+  G[scripts/run_baseline.py] --> C
+  H[scripts/smoke_test.py] --> B
+  H --> I[logs/validator_latest.json]
+```
 
 ## Tasks
 
-1. `easy_billing_classification` (easy)
-- Goal: classify a billing issue and resolve duplicate charge complaint.
+1. `easy_billing_duplicate_charge` (easy)
+- Edge case: duplicate monthly charge complaint with refund expectation.
 
-2. `medium_technical_response` (medium)
-- Goal: classify a technical issue and provide a high-quality troubleshooting response.
+2. `easy_refund_window_policy` (easy)
+- Edge case: refund requested outside standard window, requiring policy explanation.
 
-3. `hard_refund_multistep` (hard)
-- Goal: ask follow-up details, propose refund resolution, and close ticket in correct sequence.
+3. `medium_technical_login_loop` (medium)
+- Edge case: repeated token expiration after password reset.
+
+4. `medium_billing_invoice_mismatch` (medium)
+- Edge case: invoice total mismatch due to tax interpretation.
+
+5. `hard_refund_damaged_multistep` (hard)
+- Multi-step: gather proof, provide resolution, close in proper sequence.
+
+6. `hard_technical_outage_escalation` (hard)
+- Multi-step: gather incident details, provide mitigation, escalate and close safely.
 
 All graders return scores in `[0.0, 1.0]`.
 
@@ -92,26 +126,37 @@ curl http://localhost:7860/baseline
 
 ## Baseline inference
 
-Deterministic baseline script:
+Deterministic baseline script with positive and negative episode analysis:
 
 ```bash
 python scripts/run_baseline.py
 ```
 
-Expected output format:
+Output includes:
 
 ```json
 {
-  "average_score": 0.9,
+  "average_score": 0.95,
+  "failure_case_average": 0.2,
+  "robustness_margin": 0.75,
   "results": [
-    {"task_id": "easy_billing_classification", "score": 1.0, "steps": 1},
-    {"task_id": "medium_technical_response", "score": 1.0, "steps": 1},
-    {"task_id": "hard_refund_multistep", "score": 0.8, "steps": 2}
+    {
+      "task_id": "easy_billing_duplicate_charge",
+      "score": 0.96,
+      "steps": 1,
+      "breakdown": {
+        "classification": 1.0,
+        "resolution": 1.0,
+        "response_quality": 0.84
+      },
+      "failure_case_score": 0.04,
+      "failure_case_reason": "Intentional negative run ..."
+    }
   ]
 }
 ```
 
-Exact scores may vary if reward logic is changed.
+Exact scores may vary as grader logic evolves.
 
 ## Docker
 
@@ -127,6 +172,18 @@ Run smoke tests against local server:
 ```bash
 python scripts/smoke_test.py
 ```
+
+Smoke test now validates extra negative scenarios and writes validator logs:
+
+- `logs/validator_latest.json`
+- `logs/validator_<timestamp>.json`
+
+Validated negative cases include:
+
+- invalid task id rejection (`HTTP 400`)
+- `step` before `reset` rejection (`HTTP 400`)
+- episode-closed behavior (`reward=0`, `done=true`)
+- premature close penalty (negative reward)
 
 ## Hugging Face Spaces deployment
 
@@ -152,7 +209,9 @@ Then verify:
 
 - Space URL returns `200`
 - `POST /reset` responds with a valid observation
-- `GET /baseline` returns scores for all 3 tasks
+- `GET /baseline` returns scores for all 6 tasks
+
+For submission evidence, attach or paste `logs/validator_latest.json` output.
 
 ## File map
 
@@ -161,4 +220,5 @@ Then verify:
 - `app/main.py`: FastAPI endpoints.
 - `app/baseline.py`: reproducible baseline policy.
 - `scripts/run_baseline.py`: CLI script for baseline scoring.
+- `scripts/smoke_test.py`: endpoint validation with negative tests + validator log export.
 - `openenv.yaml`: OpenEnv metadata and endpoint/model declarations.

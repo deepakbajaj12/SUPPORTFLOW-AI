@@ -6,3 +6,5 @@ __pycache__/
 .pytest_cache/
 .mypy_cache/
 .vscode/
+logs/validator_*.json
+!logs/validator_latest.json

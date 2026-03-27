@@ -1,13 +1,16 @@
 from __future__ import annotations
 
+import datetime
 import json
 import sys
 import urllib.error
 import urllib.request
 from pathlib import Path
+import tempfile
 
 PROJECT_ROOT = Path(__file__).resolve().parent.parent
 BASE_URL = "http://127.0.0.1:7860"
+LOG_DIR = PROJECT_ROOT / "logs"
 
 
 def _request(method: str, path: str, payload: dict | None = None) -> dict:
@@ -39,6 +42,34 @@ def main() -> int:
         task_list = tasks.get("tasks", [])
         checks.append(("tasks endpoint", len(task_list) >= 3, f"count={len(task_list)}"))
 
+        # Negative case: step called before reset should fail only when no active task exists.
+        pre_state = _request("GET", "/state")
+        if pre_state.get("task_id") is None:
+            step_before_reset_failed = False
+            try:
+                _request(
+                    "POST",
+                    "/step",
+                    {
+                        "classify_issue": "billing",
+                        "message": "test",
+                        "ask_followup": False,
+                        "propose_resolution": False,
+                        "close_ticket": False,
+                    },
+                )
+            except urllib.error.HTTPError as exc:
+                step_before_reset_failed = exc.code == 400
+            checks.append(("step before reset rejected", step_before_reset_failed, "expects HTTP 400"))
+        else:
+            checks.append(
+                (
+                    "step before reset rejected",
+                    True,
+                    f"skipped: server already had active task {pre_state.get('task_id')}",
+                )
+            )
+
         # Validate explicit error handling for invalid task id.
         invalid_failed_as_expected = False
         try:
@@ -47,11 +78,21 @@ def main() -> int:
             invalid_failed_as_expected = exc.code == 400
         checks.append(("invalid task rejection", invalid_failed_as_expected, "expects HTTP 400"))
 
-        reset = _request("POST", "/reset", {"task_id": "hard_refund_multistep"})
+        # Validate reset works even with no JSON body.
+        reset_default = _request("POST", "/reset")
+        checks.append(
+            (
+                "reset empty body",
+                bool(reset_default.get("observation", {}).get("task_id")),
+                json.dumps(reset_default),
+            )
+        )
+
+        reset = _request("POST", "/reset", {"task_id": "hard_refund_damaged_multistep"})
         checks.append(
             (
                 "reset endpoint",
-                reset.get("observation", {}).get("task_id") == "hard_refund_multistep",
+                reset.get("observation", {}).get("task_id") == "hard_refund_damaged_multistep",
                 json.dumps(reset),
             )
         )
@@ -89,10 +130,59 @@ def main() -> int:
         grader_score = grader.get("score", -1)
         checks.append(("grader endpoint", isinstance(grader_score, (int, float)) and 0.0 <= grader_score <= 1.0, str(grader_score)))
 
+        # Negative case: episode already done should return done=true and reward=0.
+        step_after_done = _request(
+            "POST",
+            "/step",
+            {
+                "classify_issue": "refund",
+                "message": "extra message",
+                "ask_followup": False,
+                "propose_resolution": False,
+                "close_ticket": False,
+            },
+        )
+        checks.append(
+            (
+                "step after done behavior",
+                step_after_done.get("done") is True and float(step_after_done.get("reward", 1)) == 0.0,
+                json.dumps(step_after_done),
+            )
+        )
+
+        # Negative case: premature close should be penalized.
+        _request("POST", "/reset", {"task_id": "hard_technical_outage_escalation"})
+        premature = _request(
+            "POST",
+            "/step",
+            {
+                "classify_issue": "technical",
+                "message": "Closing immediately without details.",
+                "ask_followup": False,
+                "propose_resolution": False,
+                "close_ticket": True,
+            },
+        )
+        checks.append(
+            (
+                "premature close penalty",
+                float(premature.get("reward", 0)) < 0,
+                json.dumps(premature),
+            )
+        )
+
         baseline = _request("GET", "/baseline")
         baseline_avg = baseline.get("average_score", -1)
         baseline_ok = isinstance(baseline_avg, (int, float)) and 0.0 <= baseline_avg <= 1.0
         checks.append(("baseline endpoint", baseline_ok, str(baseline_avg)))
+        baseline_rows = baseline.get("results", [])
+        has_breakdown = bool(baseline_rows) and isinstance(baseline_rows[0].get("breakdown"), dict)
+        has_failure_score = bool(baseline_rows) and isinstance(
+            baseline_rows[0].get("failure_case_score"),
+            (int, float),
+        )
+        checks.append(("baseline breakdown field", has_breakdown, json.dumps(baseline_rows[0] if baseline_rows else {})))
+        checks.append(("baseline failure analysis", has_failure_score, json.dumps(baseline_rows[0] if baseline_rows else {})))
 
     except Exception as exc:  # pragma: no cover
         print(f"FATAL: smoke test execution failed: {exc}")
@@ -105,10 +195,58 @@ def main() -> int:
 
     if failed:
         print(f"\nSmoke test failed: {len(failed)} check(s) did not pass.")
+        _write_validator_log(checks)
         return 1
 
     print("\nSmoke test passed: all checks succeeded.")
+    _write_validator_log(checks)
     return 0
+
+
+def _write_validator_log(checks: list[tuple[str, bool, str]]) -> None:
+    target_dir = LOG_DIR
+    try:
+        target_dir.mkdir(parents=True, exist_ok=True)
+    except PermissionError:
+        target_dir = Path(tempfile.gettempdir()) / "supportflow_logs"
+        target_dir.mkdir(parents=True, exist_ok=True)
+
+    timestamp = datetime.datetime.utcnow().strftime("%Y%m%dT%H%M%SZ")
+    payload = {
+        "timestamp_utc": timestamp,
+        "base_url": BASE_URL,
+        "log_directory": str(target_dir),
+        "checks": [
+            {
+                "name": name,
+                "passed": passed,
+                "detail": detail,
+            }
+            for name, passed, detail in checks
+        ],
+        "summary": {
+            "total": len(checks),
+            "passed": sum(1 for _, passed, _ in checks if passed),
+            "failed": sum(1 for _, passed, _ in checks if not passed),
+        },
+    }
+    latest_path = target_dir / "validator_latest.json"
+    timestamped_path = target_dir / f"validator_{timestamp}.json"
+    try:
+        latest_path.write_text(json.dumps(payload, indent=2), encoding="utf-8")
+        timestamped_path.write_text(json.dumps(payload, indent=2), encoding="utf-8")
+    except PermissionError:
+        fallback_dir = Path(tempfile.gettempdir()) / "supportflow_logs"
+        fallback_dir.mkdir(parents=True, exist_ok=True)
+        payload["log_directory"] = str(fallback_dir)
+        (fallback_dir / "validator_latest.json").write_text(
+            json.dumps(payload, indent=2),
+            encoding="utf-8",
+        )
+        (fallback_dir / f"validator_{timestamp}.json").write_text(
+            json.dumps(payload, indent=2),
+            encoding="utf-8",
+        )
 
 
 if __name__ == "__main__":

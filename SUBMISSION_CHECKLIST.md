@@ -16,8 +16,9 @@ python -m pip install -r requirements.txt
 ## 2. Baseline reproducibility
 
 - [ ] Baseline script runs without error
-- [ ] Output contains all 3 tasks
+- [ ] Output contains all 6 tasks
 - [ ] Scores are within `0.0-1.0`
+- [ ] `failure_case_average` and `robustness_margin` are present
 
 ```bash
 python scripts/run_baseline.py
@@ -40,9 +41,11 @@ python scripts/smoke_test.py
 - [ ] `/reset` works
 - [ ] `/step` works
 - [ ] `/state` works
-- [ ] `/tasks` returns at least 3 tasks
+- [ ] `/tasks` returns at least 6 tasks
 - [ ] `/grader` score is within `0.0-1.0`
 - [ ] `/baseline` returns all tasks and average score
+- [ ] negative checks pass (`step before reset`, `invalid task`, `premature close penalty`)
+- [ ] validator logs generated in `logs/validator_latest.json`
 
 ## 4. Docker validation
 

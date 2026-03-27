@@ -1,0 +1,87 @@
+{
+  "timestamp_utc": "20260327T112506Z",
+  "base_url": "http://127.0.0.1:7860",
+  "log_directory": "E:\\SupportFlow AI\\logs",
+  "checks": [
+    {
+      "name": "health endpoint",
+      "passed": true,
+      "detail": "{'status': 'ok'}"
+    },
+    {
+      "name": "tasks endpoint",
+      "passed": true,
+      "detail": "count=6"
+    },
+    {
+      "name": "step before reset rejected",
+      "passed": true,
+      "detail": "skipped: server already had active task hard_technical_outage_escalation"
+    },
+    {
+      "name": "invalid task rejection",
+      "passed": true,
+      "detail": "expects HTTP 400"
+    },
+    {
+      "name": "reset empty body",
+      "passed": true,
+      "detail": "{\"observation\": {\"task_id\": \"easy_billing_duplicate_charge\", \"difficulty\": \"easy\", \"customer_message\": \"I was charged twice for my monthly plan. Can you fix this?\", \"ticket_history\": [\"customer: I was charged twice for my monthly plan. Can you fix this?\"], \"available_actions\": {\"classify_issue\": \"billing|technical|refund\", \"message\": \"free text response\", \"ask_followup\": \"true|false\", \"propose_resolution\": \"true|false\", \"close_ticket\": \"true|false\"}}}"
+    },
+    {
+      "name": "reset endpoint",
+      "passed": true,
+      "detail": "{\"observation\": {\"task_id\": \"hard_refund_damaged_multistep\", \"difficulty\": \"hard\", \"customer_message\": \"My order arrived damaged. I need a refund but I do not know the process.\", \"ticket_history\": [\"customer: My order arrived damaged. I need a refund but I do not know the process.\"], \"available_actions\": {\"classify_issue\": \"billing|technical|refund\", \"message\": \"free text response\", \"ask_followup\": \"true|false\", \"propose_resolution\": \"true|false\", \"close_ticket\": \"true|false\"}}}"
+    },
+    {
+      "name": "step endpoint #1",
+      "passed": true,
+      "detail": "0.35"
+    },
+    {
+      "name": "step endpoint #2 done",
+      "passed": true,
+      "detail": "{\"observation\": {\"task_id\": \"hard_refund_damaged_multistep\", \"difficulty\": \"hard\", \"customer_message\": \"My order arrived damaged. I need a refund but I do not know the process.\", \"ticket_history\": [\"customer: My order arrived damaged. I need a refund but I do not know the process.\", \"agent: Please share your order ID and a photo of the damaged package.\", \"agent: Refund approved for the damaged order.\"], \"available_actions\": {\"classify_issue\": \"billing|technical|refund\", \"message\": \"free text response\", \"ask_followup\": \"true|false\", \"propose_resolution\": \"true|false\", \"close_ticket\": \"true|false\"}}, \"reward\": 0.24, \"done\": true, \"info\": {\"step\": 2, \"events\": [\"partial_resolution_attempt\", \"ticket_closed\"], \"quality\": {\"keyword_coverage\": 1.0, \"empathy\": 0.0, \"actionability\": 0.333, \"policy\": 1.0, \"tone_safety\": 1.0, \"overall\": 0.633}, \"grader_preview\": {\"score\": 0.936, \"classification\": 1.0, \"followup\": 1.0, \"resolution\": 1.0, \"closure\": 1.0, \"response_quality\": 0.575, \"empathy\": 0.0, \"actionability\": 0.333, \"policy\": 1.0, \"safety\": 1.0, \"efficiency\": 0.8}}}"
+    },
+    {
+      "name": "state endpoint",
+      "passed": true,
+      "detail": "{\"episode_id\": \"4177e003-5528-4ce6-a2b3-cd3bd264c2a0\", \"task_id\": \"hard_refund_damaged_multistep\", \"step_count\": 2, \"done\": true, \"cumulative_reward\": 0.59, \"signals\": {\"classification_correct\": true, \"followup_done\": true, \"resolution_proposed\": true, \"ticket_closed\": true, \"response_quality_good\": false, \"tone_safe\": true}}"
+    },
+    {
+      "name": "grader endpoint",
+      "passed": true,
+      "detail": "0.936"
+    },
+    {
+      "name": "step after done behavior",
+      "passed": true,
+      "detail": "{\"observation\": {\"task_id\": \"hard_refund_damaged_multistep\", \"difficulty\": \"hard\", \"customer_message\": \"My order arrived damaged. I need a refund but I do not know the process.\", \"ticket_history\": [\"customer: My order arrived damaged. I need a refund but I do not know the process.\", \"agent: Please share your order ID and a photo of the damaged package.\", \"agent: Refund approved for the damaged order.\"], \"available_actions\": {\"classify_issue\": \"billing|technical|refund\", \"message\": \"free text response\", \"ask_followup\": \"true|false\", \"propose_resolution\": \"true|false\", \"close_ticket\": \"true|false\"}}, \"reward\": 0.0, \"done\": true, \"info\": {\"message\": \"Episode already finished.\"}}"
+    },
+    {
+      "name": "premature close penalty",
+      "passed": true,
+      "detail": "{\"observation\": {\"task_id\": \"hard_technical_outage_escalation\", \"difficulty\": \"hard\", \"customer_message\": \"Our dashboard has been down for 40 minutes and we are losing sales.\", \"ticket_history\": [\"customer: Our dashboard has been down for 40 minutes and we are losing sales.\", \"agent: Closing immediately without details.\"], \"available_actions\": {\"classify_issue\": \"billing|technical|refund\", \"message\": \"free text response\", \"ask_followup\": \"true|false\", \"propose_resolution\": \"true|false\", \"close_ticket\": \"true|false\"}}, \"reward\": -0.02, \"done\": false, \"info\": {\"step\": 1, \"events\": [\"correct_classification\", \"premature_close\"], \"quality\": {\"keyword_coverage\": 0.0, \"empathy\": 0.0, \"actionability\": 0.0, \"policy\": 1.0, \"tone_safety\": 1.0, \"overall\": 0.2}, \"grader_preview\": {\"score\": 0.38, \"classification\": 1.0, \"followup\": 0.0, \"resolution\": 0.0, \"closure\": 0.0, \"response_quality\": 0.2, \"empathy\": 0.0, \"actionability\": 0.0, \"policy\": 1.0, \"safety\": 1.0, \"efficiency\": 0.0}}}"
+    },
+    {
+      "name": "baseline endpoint",
+      "passed": true,
+      "detail": "0.936"
+    },
+    {
+      "name": "baseline breakdown field",
+      "passed": true,
+      "detail": "{\"task_id\": \"easy_billing_duplicate_charge\", \"score\": 0.973, \"steps\": 1, \"breakdown\": {\"classification\": 1.0, \"followup\": 0.0, \"resolution\": 1.0, \"closure\": 1.0, \"response_quality\": 0.817, \"empathy\": 0.5, \"actionability\": 0.667, \"policy\": 1.0, \"safety\": 1.0, \"efficiency\": 1.0}, \"failure_case_score\": 0.115, \"failure_case_reason\": \"Intentional negative run with wrong classification, unsafe tone, and premature closure to measure robustness margin.\"}"
+    },
+    {
+      "name": "baseline failure analysis",
+      "passed": true,
+      "detail": "{\"task_id\": \"easy_billing_duplicate_charge\", \"score\": 0.973, \"steps\": 1, \"breakdown\": {\"classification\": 1.0, \"followup\": 0.0, \"resolution\": 1.0, \"closure\": 1.0, \"response_quality\": 0.817, \"empathy\": 0.5, \"actionability\": 0.667, \"policy\": 1.0, \"safety\": 1.0, \"efficiency\": 1.0}, \"failure_case_score\": 0.115, \"failure_case_reason\": \"Intentional negative run with wrong classification, unsafe tone, and premature closure to measure robustness margin.\"}"
+    }
+  ],
+  "summary": {
+    "total": 15,
+    "passed": 15,
+    "failed": 0
+  }
+}

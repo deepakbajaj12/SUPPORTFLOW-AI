@@ -14,6 +14,9 @@ models:
   observation_model: app.models.Observation
   state_model: app.models.StateResponse
 tasks:
-  - easy_billing_classification
-  - medium_technical_response
-  - hard_refund_multistep
+  - easy_billing_duplicate_charge
+  - easy_refund_window_policy
+  - medium_technical_login_loop
+  - medium_billing_invoice_mismatch
+  - hard_refund_damaged_multistep
+  - hard_technical_outage_escalation
