@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from fastapi import FastAPI, HTTPException
+from fastapi import Body, FastAPI, HTTPException
 
 from app.baseline import run_baseline
 from app.environment import SupportFlowEnvironment
@@ -30,7 +30,7 @@ def health() -> dict[str, str]:
 
 
 @app.post("/reset", response_model=ResetResponse)
-def reset(request: ResetRequest) -> ResetResponse:
+def reset(request: ResetRequest = Body(default=ResetRequest())) -> ResetResponse:
     try:
         observation = env.reset(request.task_id)
     except ValueError as exc:

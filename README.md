@@ -1,3 +1,10 @@
+---
+title: SupportFlow AI
+sdk: docker
+app_port: 7860
+pinned: false
+---
+
 # SupportFlow AI (OpenEnv Round 1 Project)
 
 SupportFlow AI is a real-world customer support resolution environment for OpenEnv.
@@ -115,6 +122,12 @@ docker build -t supportflow-ai .
 docker run -p 7860:7860 supportflow-ai
 ```
 
+Run smoke tests against local server:
+
+```bash
+python scripts/smoke_test.py
+```
+
 ## Hugging Face Spaces deployment
 
 Use Docker Space and include this repository files as-is:
@@ -126,6 +139,20 @@ Use Docker Space and include this repository files as-is:
 - `openenv.yaml`
 
 Set Space to expose port `7860`.
+
+Suggested deployment flow:
+
+```bash
+huggingface-cli login
+git remote add hf https://huggingface.co/spaces/<your-username>/supportflow-ai
+git push hf master
+```
+
+Then verify:
+
+- Space URL returns `200`
+- `POST /reset` responds with a valid observation
+- `GET /baseline` returns scores for all 3 tasks
 
 ## File map
 
