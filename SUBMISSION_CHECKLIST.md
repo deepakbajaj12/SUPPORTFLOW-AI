@@ -2,9 +2,9 @@
 
 ## 1. Local environment
 
-- [ ] Use Python `3.10+` (recommended `3.11`)
-- [ ] Create and activate virtual environment
-- [ ] Install dependencies
+- [x] Use Python `3.10+` (recommended `3.11`)
+- [x] Create and activate virtual environment
+- [x] Install dependencies
 
 ```bash
 py -3.11 -m venv .venv
@@ -15,10 +15,10 @@ python -m pip install -r requirements.txt
 
 ## 2. Baseline reproducibility
 
-- [ ] Baseline script runs without error
-- [ ] Output contains all 6 tasks
-- [ ] Scores are within `0.0-1.0`
-- [ ] `failure_case_average` and `robustness_margin` are present
+- [x] Baseline script runs without error
+- [x] Output contains all 6 tasks
+- [x] Scores are within `0.0-1.0`
+- [x] `failure_case_average` and `robustness_margin` are present
 
 ```bash
 python scripts/run_baseline.py
@@ -46,11 +46,19 @@ python scripts/smoke_test.py
 - [ ] `/baseline` returns all tasks and average score
 - [ ] negative checks pass (`step before reset`, `invalid task`, `premature close penalty`)
 - [ ] validator logs generated in `logs/validator_latest.json`
+- [x] `/reset` works
+- [x] `/step` works
+- [x] `/state` works
+- [x] `/tasks` returns at least 6 tasks
+- [x] `/grader` score is within `0.0-1.0`
+- [x] `/baseline` returns all tasks and average score
+- [x] negative checks pass (`step before reset`, `invalid task`, `premature close penalty`)
+- [x] validator logs generated in `logs/validator_latest.json`
 
 ## 4. Docker validation
 
-- [ ] Image builds successfully
-- [ ] Container starts and serves API
+- [ ] Image builds successfully (blocked: `docker` CLI not installed on this machine)
+- [ ] Container starts and serves API (blocked until Docker install)
 
 ```bash
 docker build -t supportflow-ai .
@@ -59,19 +67,19 @@ docker run -p 7860:7860 supportflow-ai
 
 ## 5. Hugging Face Space validation
 
-- [ ] `huggingface-cli login` completed
-- [ ] Repo pushed to Docker Space
+- [ ] `huggingface-cli login` completed (requires your account token)
+- [ ] Repo pushed to Docker Space (requires your Space URL/permissions)
 - [ ] Space URL returns HTTP `200`
 - [ ] `POST /reset` responds correctly
 - [ ] `GET /baseline` works
 
 ## 6. Submission package sanity
 
-- [ ] `openenv.yaml` present
-- [ ] `Dockerfile` present
-- [ ] `README.md` has setup + endpoints + action/observation info
-- [ ] `app/` includes typed models and `step/reset/state` implementation
-- [ ] No local-only secrets committed
+- [x] `openenv.yaml` present
+- [x] `Dockerfile` present
+- [x] `README.md` has setup + endpoints + action/observation info
+- [x] `app/` includes typed models and `step/reset/state` implementation
+- [x] No local-only secrets committed
 
 ## 7. Final pre-submit command set
 

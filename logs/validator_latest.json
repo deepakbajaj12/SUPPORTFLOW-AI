@@ -1,5 +1,5 @@
 {
-  "timestamp_utc": "20260327T112506Z",
+  "timestamp_utc": "20260328T075407Z",
   "base_url": "http://127.0.0.1:7860",
   "log_directory": "E:\\SupportFlow AI\\logs",
   "checks": [
@@ -16,7 +16,7 @@
     {
       "name": "step before reset rejected",
       "passed": true,
-      "detail": "skipped: server already had active task hard_technical_outage_escalation"
+      "detail": "expects HTTP 400"
     },
     {
       "name": "invalid task rejection",
@@ -46,7 +46,7 @@
     {
       "name": "state endpoint",
       "passed": true,
-      "detail": "{\"episode_id\": \"4177e003-5528-4ce6-a2b3-cd3bd264c2a0\", \"task_id\": \"hard_refund_damaged_multistep\", \"step_count\": 2, \"done\": true, \"cumulative_reward\": 0.59, \"signals\": {\"classification_correct\": true, \"followup_done\": true, \"resolution_proposed\": true, \"ticket_closed\": true, \"response_quality_good\": false, \"tone_safe\": true}}"
+      "detail": "{\"episode_id\": \"1de22774-3c0d-4a71-a31b-19b121473364\", \"task_id\": \"hard_refund_damaged_multistep\", \"step_count\": 2, \"done\": true, \"cumulative_reward\": 0.59, \"signals\": {\"classification_correct\": true, \"followup_done\": true, \"resolution_proposed\": true, \"ticket_closed\": true, \"response_quality_good\": false, \"tone_safe\": true}}"
     },
     {
       "name": "grader endpoint",
