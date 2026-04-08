@@ -102,6 +102,7 @@ def run_episode(env: SupportFlowEnvironment, client: OpenAI, task_id: str) -> No
     steps = 0
     success = False
     last_error: str | None = None
+    final_score = 0.0
 
     print(f"[START] task={task_id} env={BENCHMARK} model={MODEL_NAME}")
 
@@ -123,18 +124,21 @@ def run_episode(env: SupportFlowEnvironment, client: OpenAI, task_id: str) -> No
             )
             if done:
                 grade = env.grader()
-                success = bool(grade.get("score", 0.0) >= 0.7)
+                final_score = grade.get("score", 0.0)
+                success = bool(final_score >= 0.7)
     except Exception as exc:
         last_error = str(exc)
     finally:
         if not success and last_error is None:
             grade = env.grader()
-            success = bool(grade.get("score", 0.0) >= 0.7)
+            final_score = grade.get("score", 0.0)
+            success = bool(final_score >= 0.7)
         rewards_str = ",".join(_reward_str(item) for item in rewards)
         print(
             "[END] "
             f"success={_bool_str(success)} "
             f"steps={steps} "
+            f"score={final_score:.2f} "
             f"rewards={rewards_str}"
         )
 
