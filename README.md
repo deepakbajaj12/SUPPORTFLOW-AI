@@ -158,6 +158,28 @@ Output includes:
 
 Exact scores may vary as grader logic evolves.
 
+## Submission inference script
+
+The required evaluator entrypoint is [inference.py](inference.py) at the repository root.
+
+Before running it, set:
+
+- `API_BASE_URL`
+- `MODEL_NAME`
+- `HF_TOKEN`
+
+Run:
+
+```bash
+python inference.py
+```
+
+The script prints strict structured lines only:
+
+- `[START] task=<task_name> env=<benchmark> model=<model_name>`
+- `[STEP] step=<n> action=<action_str> reward=<0.00> done=<true|false> error=<msg|null>`
+- `[END] success=<true|false> steps=<n> rewards=<r1,r2,...,rn>`
+
 ## Docker
 
 Build and run:

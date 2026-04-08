@@ -1,4 +1,4 @@
-# Submission Checklist (Round 1)
+ # Submission Checklist (Round 1)
 
 ## 1. Local environment
 
@@ -57,8 +57,8 @@ python scripts/smoke_test.py
 
 ## 4. Docker validation
 
-- [ ] Image builds successfully (blocked: `docker` CLI not installed on this machine)
-- [ ] Container starts and serves API (blocked until Docker install)
+- [x] Image builds successfully
+- [x] Container starts and serves API
 
 ```bash
 docker build -t supportflow-ai .
