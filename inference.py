@@ -11,7 +11,7 @@ from app.environment import SupportFlowEnvironment
 from app.models import Action
 
 
-API_KEY = os.getenv("HF_TOKEN")
+HF_TOKEN = os.getenv("HF_TOKEN")
 API_BASE_URL = os.getenv("API_BASE_URL", "https://router.huggingface.co/v1")
 MODEL_NAME = os.getenv("MODEL_NAME", "Qwen/Qwen2.5-72B-Instruct")
 BENCHMARK = os.getenv("SUPPORTFLOW_BENCHMARK", "supportflow-ai")
@@ -56,9 +56,9 @@ def _extract_json_object(text: str) -> dict[str, Any]:
 
 
 def _make_client() -> OpenAI:
-    if not API_KEY:
+    if not HF_TOKEN:
         raise RuntimeError("HF_TOKEN must be set.")
-    return OpenAI(base_url=API_BASE_URL, api_key=API_KEY)
+    return OpenAI(base_url=API_BASE_URL, api_key=HF_TOKEN)
 
 
 def _llm_action(client: OpenAI, task_id: str, history: list[str]) -> Action:

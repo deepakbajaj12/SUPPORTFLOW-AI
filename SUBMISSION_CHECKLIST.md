@@ -67,11 +67,11 @@ docker run -p 7860:7860 supportflow-ai
 
 ## 5. Hugging Face Space validation
 
-- [ ] `huggingface-cli login` completed (requires your account token)
-- [ ] Repo pushed to Docker Space (requires your Space URL/permissions)
-- [ ] Space URL returns HTTP `200`
-- [ ] `POST /reset` responds correctly
-- [ ] `GET /baseline` works
+- [x] `huggingface-cli login` completed (requires your account token)
+- [x] Repo pushed to Docker Space (requires your Space URL/permissions)
+- [x] Space URL returns HTTP `200`
+- [x] `POST /reset` responds correctly
+- [x] `GET /baseline` works
 
 ## 6. Submission package sanity
 
