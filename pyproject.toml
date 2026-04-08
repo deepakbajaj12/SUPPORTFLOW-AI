@@ -1,16 +1,21 @@
 [build-system]
-requires = ["setuptools>=61.0"]
-build-backend = "setuptools.build_meta"
+requires = ['setuptools>=61.0']
+build-backend = 'setuptools.build_meta'
 
 [project]
-name = "supportflow-ai"
-version = "0.1.0"
-description = "SupportFlow AI OpenEnv Environment"
-readme = "README.md"
-requires-python = ">=3.10"
+name = 'supportflow-ai'
+version = '0.1.0'
+description = 'SupportFlow AI'
+readme = 'README.md'
+requires-python = '>=3.10'
 dependencies = [
-    "fastapi>=0.100.0",
-    "uvicorn>=0.22.0",
-    "pydantic>=2.0.0",
-    "openai>=1.75.0"
+    'fastapi>=0.100.0',
+    'uvicorn>=0.22.0',
+    'pydantic>=2.0.0',
+    'openai>=1.75.0',
+    'openenv-core>=0.2.0'
 ]
+
+[project.scripts]
+server = 'server.app:run'
+
