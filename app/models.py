@@ -98,3 +98,8 @@ class BaselineResult(BaseModel):
 class BaselineResponse(BaseModel):
     average_score: float
     results: list[BaselineResult]
+
+class InfoResponse(BaseModel):
+    name: str
+    version: str
+    description: str

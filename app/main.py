@@ -13,6 +13,7 @@ from app.models import (
     StateResponse,
     StepResponse,
     TasksResponse,
+    InfoResponse,
 )
 
 app = FastAPI(title="SupportFlow AI OpenEnv", version="0.1.0")
@@ -27,6 +28,15 @@ def root() -> dict[str, str]:
 @app.get("/health")
 def health() -> dict[str, str]:
     return {"status": "ok"}
+
+
+@app.get("/info", response_model=InfoResponse)
+def info() -> InfoResponse:
+    return InfoResponse(
+        name="SupportFlow AI",
+        version="0.1.0",
+        description="A real-world customer support resolution environment for OpenEnv."
+    )
 
 
 @app.post("/reset", response_model=ResetResponse)
